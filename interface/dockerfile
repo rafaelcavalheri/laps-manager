@@ -1,0 +1,97 @@
+FROM php:8.1-apache
+
+# Argumentos de build para receber variáveis do .env
+ARG DB_HOST
+ARG DB_NAME
+ARG DB_USER
+ARG DB_PASSWORD
+ARG TZ
+ARG LDAP_SERVER
+ARG LDAP_USER
+ARG LDAP_BASE
+ARG LDAP_PASSWORD
+
+# Define o fuso horário
+ENV TZ=${TZ}
+
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+# Instala dependências necessárias
+RUN apt-get update && apt-get install -y \
+    libzip-dev \
+    zip \
+    unzip \
+    ldap-utils \
+    libldap2-dev \
+    default-mysql-client \
+    sudo \
+    gawk \
+    cron \
+    gettext-base && \
+    docker-php-ext-install pdo_mysql zip mysqli ldap && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Habilita o módulo Apache rewrite
+RUN a2enmod rewrite
+
+# Copia os arquivos da aplicação para o contêiner
+COPY ./php /var/www/html/
+COPY ./img /var/www/html/img/
+
+# Copia o arquivo .env se existir
+COPY ./.env /var/www/html/.env  
+
+# Copia a configuração do Apache para variáveis de ambiente
+COPY ./apache_env.conf /etc/apache2/conf-available/env.conf
+
+# Substitui as variáveis de ambiente no arquivo de configuração do Apache
+RUN envsubst < /etc/apache2/conf-available/env.conf > /etc/apache2/conf-available/env.conf.tmp && \
+    mv /etc/apache2/conf-available/env.conf.tmp /etc/apache2/conf-available/env.conf && \
+    a2enconf env
+
+# Copia os scripts bash e dá permissão de execução
+COPY ./scripts/ldap-up.sh /usr/local/bin/ldap-up.sh
+
+RUN sed -i 's/\r$//' /usr/local/bin/ldap-up.sh && chmod +x /usr/local/bin/ldap-up.sh
+
+# Dá permissão para o usuário www-data executar o script ldap-up.sh
+RUN chown www-data:www-data /usr/local/bin/ldap-up.sh && \
+    chmod 700 /usr/local/bin/ldap-up.sh
+
+# Define permissões para o diretório da aplicação
+RUN chown -R www-data:www-data /var/www/html
+
+# Garante que o arquivo ldap_settings.php tenha permissões corretas
+RUN chmod 664 /var/www/html/ldap_settings.php
+
+
+# Configura o cron job para executar o script a cada 1 hora
+RUN echo "0 * * * * root /usr/local/bin/ldap-up.sh" > /etc/cron.d/ldap-up-cron
+
+# Dá permissão de execução para o arquivo de cron
+RUN chmod 0644 /etc/cron.d/ldap-up-cron
+
+# Cria os arquivos de log e dá permissão para o www-data
+RUN touch /var/log/cron.log /var/log/ldap-up.log && \
+    chown -R www-data:www-data /var/log && \
+    chmod 755 /var/log && \
+    chmod 644 /var/log/cron.log /var/log/ldap-up.log
+
+# Copia o script de inicialização e dá permissão de execução
+COPY ./scripts/start.sh /usr/local/bin/start.sh
+RUN sed -i 's/\r$//' /usr/local/bin/start.sh && chmod +x /usr/local/bin/start.sh
+
+# Script para criar usuário personalizado se necessário
+RUN echo '#!/bin/bash\n\
+if [ "$DB_USER" != "root" ]; then\n\
+    echo "Criando usuário personalizado: $DB_USER"\n\
+    mysql -h $DB_HOST -u root -p$MYSQL_ROOT_PASSWORD -e "CREATE USER IF NOT EXISTS \"$DB_USER\"@\"%\" IDENTIFIED BY \"$DB_PASSWORD\";"\n\
+    mysql -h $DB_HOST -u root -p$MYSQL_ROOT_PASSWORD -e "GRANT ALL PRIVILEGES ON $DB_NAME.* TO \"$DB_USER\"@\"%\";"\n\
+    mysql -h $DB_HOST -u root -p$MYSQL_ROOT_PASSWORD -e "FLUSH PRIVILEGES;"\n\
+    echo "Usuário $DB_USER criado com sucesso"\n\
+else\n\
+    echo "Usando usuário root (padrão)"\n\
+fi' > /usr/local/bin/create-user.sh && chmod +x /usr/local/bin/create-user.sh
+
+# Define o comando de inicialização
+CMD ["/usr/local/bin/start.sh"]

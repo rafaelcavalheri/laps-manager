@@ -1,0 +1,45 @@
+# Desabilitar listagem de diretórios
+Options -Indexes
+
+# Proteção específica de arquivos sensíveis
+<Files "ldap_settings.php">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+<Files "config.php">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# Permitir acesso a arquivos PHP principais
+<Files "index.php">
+    Order Allow,Deny
+    Allow from all
+</Files>
+
+<Files "ldap_config.php">
+    Order Allow,Deny
+    Allow from all
+</Files>
+
+<Files "view_laps.php">
+    Order Allow,Deny
+    Allow from all
+</Files>
+
+<Files "login.php">
+    Order Allow,Deny
+    Allow from all
+</Files>
+
+<Files "logout.php">
+    Order Allow,Deny
+    Allow from all
+</Files>
+
+# Proteção de arquivos de configuração e log
+<FilesMatch "\.(conf|log|bak|tmp)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>

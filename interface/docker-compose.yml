@@ -1,0 +1,124 @@
+services:
+
+  web:
+
+    build:
+      context: .
+      dockerfile: dockerfile
+      args:
+        - DB_HOST=${DB_HOST}
+        - DB_NAME=${DB_NAME}
+        - DB_USER=${DB_USER}
+        - DB_PASSWORD=${DB_PASSWORD}
+        - TZ=${TZ}
+        - LDAP_SERVER=${LDAP_SERVER}
+        - LDAP_USER=${LDAP_USER}
+        - LDAP_BASE=${LDAP_BASE}
+        - LDAP_PASSWORD=${LDAP_PASSWORD}
+
+    image: ${WEB_IMAGE}
+
+    container_name: laps-web
+
+    ports:
+
+      - ${WEB_PORT}:80
+
+    volumes:
+
+      - php-sessions:/var/lib/php/sessions
+
+      - apache-logs:/var/log/apache2
+
+    environment:
+
+      - DB_HOST=${DB_HOST}
+
+      - DB_NAME=${DB_NAME}
+
+      - DB_USER=${DB_USER}
+
+      - DB_PASSWORD=${DB_PASSWORD}
+
+      - TZ=${TZ}
+
+      - LDAP_SERVER=${LDAP_SERVER}
+
+      - LDAP_USER=${LDAP_USER}
+
+      - LDAP_BASE=${LDAP_BASE}
+
+      - LDAP_PASSWORD=${LDAP_PASSWORD}
+
+    depends_on:
+
+      db:
+
+        condition: service_healthy
+
+    networks:
+
+      - laps-network
+
+    restart: unless-stopped
+
+
+  db:
+
+    image: mysql:8.0
+
+    container_name: laps-db
+
+    command: --local-infile=1
+
+    volumes:
+
+      - db_data:/var/lib/mysql
+
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+    environment:
+
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+
+      - TZ=${TZ}
+
+      - LANG=pt_BR.UTF-8
+
+    healthcheck:
+
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
+
+      interval: 10s
+
+      timeout: 20s
+
+      retries: 10
+
+    networks:
+
+      - laps-network
+
+    restart: unless-stopped
+
+
+volumes:
+
+  db_data:
+
+    driver: local
+
+  php-sessions:
+
+  apache-logs:
+
+
+networks:
+
+  laps-network:
+
+    driver: bridge
+
+    attachable: true

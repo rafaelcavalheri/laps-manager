@@ -1,0 +1,324 @@
+/* Dashboard LAPS - Estilos Específicos */
+
+.dashboard-container {
+    max-width: 1400px;
+    margin: 2rem auto;
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: 0 10px 25px -5px var(--shadow-color), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    padding: 2rem;
+    animation: fadeIn 0.3s ease-out;
+    border: 1px solid var(--card-border);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.stat-card-link:hover {
+    text-decoration: none;
+}
+
+.stat-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    text-align: center;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px -5px var(--shadow-color);
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary), var(--success));
+}
+
+.stat-card.warning::before {
+    background: linear-gradient(90deg, var(--warning), #fbbf24);
+}
+
+.stat-card.danger::before {
+    background: linear-gradient(90deg, var(--danger), #f87171);
+}
+
+.stat-card.success::before {
+    background: linear-gradient(90deg, var(--success), #22c55e);
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--primary);
+}
+
+.stat-card.warning .stat-icon {
+    color: var(--warning);
+}
+
+.stat-card.danger .stat-icon {
+    color: var(--danger);
+}
+
+.stat-card.success .stat-icon {
+    color: var(--success);
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    color: var(--text-color);
+    opacity: 0.8;
+    font-size: 0.9rem;
+}
+
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.chart-container {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    position: relative;
+    transition: box-shadow var(--transition-fast);
+}
+
+.chart-container:hover {
+    box-shadow: 0 4px 15px -5px var(--shadow-color);
+}
+
+.chart-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--text-color);
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.chart-canvas {
+    position: relative;
+    height: 300px;
+}
+
+.alert-card {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border: 1px solid #f59e0b;
+    border-radius: var(--radius);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    animation: slideInDown 0.3s ease-out;
+}
+
+.alert-card.warning {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border-color: #f59e0b;
+}
+
+.alert-card.danger {
+    background: linear-gradient(135deg, #fee2e2, #fecaca);
+    border-color: #ef4444;
+}
+
+.alert-icon {
+    font-size: 1.5rem;
+    color: #f59e0b;
+}
+
+.alert-icon.danger {
+    color: #ef4444;
+}
+
+.alert-content h3 {
+    margin: 0 0 0.5rem 0;
+    color: var(--text-color);
+}
+
+.alert-content p {
+    margin: 0;
+    color: var(--text-color);
+    opacity: 0.8;
+}
+
+.dashboard-header {
+    margin-bottom: 2rem;
+}
+
+.dashboard-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+.dashboard-subtitle {
+    color: var(--text-color);
+    opacity: 0.7;
+    text-align: center;
+    font-size: 1rem;
+}
+
+/* Animações */
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .dashboard-container {
+        margin: 1rem;
+        padding: 1rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .charts-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .chart-container {
+        padding: 1rem;
+    }
+
+    .stat-card {
+        padding: 1rem;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+    }
+
+    .stat-icon {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-container {
+        margin: 0.5rem;
+        padding: 0.5rem;
+    }
+
+    .chart-canvas {
+        height: 250px;
+    }
+
+    .alert-card {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+/* Tema Escuro */
+[data-theme="dark"] .alert-card {
+    background: linear-gradient(135deg, #451a03, #78350f);
+    border-color: #f59e0b;
+}
+
+[data-theme="dark"] .alert-card.danger {
+    background: linear-gradient(135deg, #450a0a, #7f1d1d);
+    border-color: #ef4444;
+}
+
+[data-theme="dark"] .stat-card {
+    background: var(--card-bg);
+    border-color: var(--card-border);
+}
+
+[data-theme="dark"] .chart-container {
+    background: var(--card-bg);
+    border-color: var(--card-border);
+}
+
+/* Melhorias de acessibilidade */
+.stat-card:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.chart-container:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* Loading states */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid var(--primary);
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

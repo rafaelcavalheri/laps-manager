@@ -1,0 +1,47 @@
+# Arquivos de configuração sensíveis
+.env
+.env.local
+.env.production
+
+# Arquivos de log
+*.log
+logs/
+
+# Arquivos temporários
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
+
+# Arquivos de IDE
+.vscode/
+.idea/
+*.sublime-*
+
+# Arquivos de backup
+*.bak
+*.backup
+
+# Arquivos de cache
+cache/
+tmp/
+
+# Arquivos de sessão PHP
+sessions/
+
+# Arquivos de upload
+uploads/
+
+
+# Arquivos de certificados
+*.pem
+*.key
+*.crt
+*.p12
+
+# Arquivos de Docker
+docker-compose.override.yml 
