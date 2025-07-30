@@ -119,8 +119,8 @@ for ($i = 29; $i >= 0; $i--) {
     
     $result = $conn->query("
         SELECT COUNT(*) as total 
-        FROM Passwords 
-        WHERE DATE(updated_at) = '$date'
+        FROM Passwords p
+        WHERE EXISTS (SELECT 1 FROM old_passwords o WHERE o.ComputerName = p.ComputerName AND DATE(o.created_at) = '$date')
     ")->fetch_assoc();
     
     $dailyData[] = [
