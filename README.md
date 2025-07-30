@@ -1,10 +1,10 @@
 # Gerenciador de Senhas LAPS
 
-Sistema de gerenciamento de senhas LAPS (Local Administrator Password Solution) para a Prefeitura de Mogi Mirim.
+Sistema de gerenciamento de senhas LAPS (Local Administrator Password Solution).
 
 ## 📋 Apresentação
 
-O Gerenciador de Senhas LAPS é uma aplicação web desenvolvida para centralizar e gerenciar as senhas de administrador local de todos os computadores da rede da Prefeitura de Mogi Mirim. O sistema integra-se ao Active Directory (LDAP) para sincronizar automaticamente as senhas LAPS e fornece uma interface intuitiva para visualização, gerenciamento e monitoramento.
+O Gerenciador de Senhas LAPS é uma aplicação web desenvolvida para centralizar e gerenciar as senhas de administrador local de todos os computadores da rede. O sistema integra-se ao Active Directory (LDAP) para sincronizar automaticamente as senhas LAPS e fornece uma interface intuitiva para visualização, gerenciamento e monitoramento.
 
 ## 🎯 Funcionalidades Principais
 
