@@ -131,6 +131,9 @@ LDAP_PASS=senha_ldap
 
 # Configurações GLPI
 GLPI_URL=https://glpi.exemplo.com
+
+# Grupos permitidos para acesso (separados por vírgula)
+LDAP_ALLOWED_GROUPS=Domain Admins
 ```
 
 ### Configuração do GLPI
@@ -139,6 +142,13 @@ O sistema integra-se ao GLPI para permitir visualização dos computadores no si
 1. **URL do GLPI**: Configure a variável `GLPI_URL` no arquivo `.env`
 2. **Exemplo**: `GLPI_URL=https://glpi.sua-empresa.com`
 3. **Funcionalidade**: O botão "Ver no GLPI" na tabela de senhas abrirá o computador correspondente no GLPI
+
+### Configuração de Grupos Permitidos
+O sistema verifica se o usuário pertence aos grupos configurados no Active Directory. Para configurar:
+
+1. **Grupos Permitidos**: Configure a variável `LDAP_ALLOWED_GROUPS` no arquivo `.env`
+2. **Exemplo**: `LDAP_ALLOWED_GROUPS=Domain Admins,Administradores,TI`
+3. **Funcionalidade**: Apenas usuários dos grupos especificados poderão fazer login no sistema
 
 ### Deploy com Docker
 ```bash

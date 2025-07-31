@@ -74,12 +74,19 @@ function authenticateADUser($username, $password, $config = null) {
     if (isset($entries[0]['memberof'])) {
         $userGroups = $entries[0]['memberof'];
 
+        // Obter grupos permitidos da configuração
+        $allowedGroups = explode(',', $config['ldap_allowed_groups']);
+        $allowedGroups = array_map('trim', $allowedGroups); // Remove espaços em branco
+
         if (is_array($userGroups)) {
             foreach ($userGroups as $group) {
                 if (!is_numeric($group)) { // Ignora índices numéricos
-                    if (stripos($group, 'CN=STI,') !== false || stripos($group, 'CN=Domain Admins,') !== false) {
-                        $isAuthorized = true;
-                        break;
+                    // Verificar se o usuário pertence a algum dos grupos permitidos
+                    foreach ($allowedGroups as $allowedGroup) {
+                        if (stripos($group, 'CN=' . $allowedGroup . ',') !== false) {
+                            $isAuthorized = true;
+                            break 2; // Sai dos dois loops
+                        }
                     }
                 }
             }

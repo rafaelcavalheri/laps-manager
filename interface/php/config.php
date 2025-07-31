@@ -44,7 +44,8 @@ $config = [
     'user' => getenv('DB_USER') ?: 'root',
     'password' => getenv('DB_PASSWORD') ?: '',
     'dbname' => getenv('DB_NAME') ?: 'laps',
-    'glpi_url' => getenv('GLPI_URL') ?: 'https://glpi.exemplo.com'
+    'glpi_url' => getenv('GLPI_URL') ?: 'https://glpi.exemplo.com',
+    'ldap_allowed_groups' => getenv('LDAP_ALLOWED_GROUPS') ?: 'Domain Admins'
 ];
 
 // Função para carregar configurações LDAP de forma segura
