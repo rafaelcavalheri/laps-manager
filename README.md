@@ -55,10 +55,7 @@ O Gerenciador de Senhas LAPS é uma aplicação web desenvolvida para centraliza
 
 ### 1. Acesso ao Sistema
 - **URL**: Acesse a aplicação através do navegador
-- **Credenciais Padrão**:
-  - Usuário: `admin`
-  - Senha: `Laps@Admin`
-- **⚠️ Importante**: Altere a senha padrão imediatamente após o primeiro login
+- **⚠️ Importante**: Configure o usuário e senha no arquivo `init.sql` antes do primeiro deploy
 
 ### 2. Dashboard
 - **Acesso**: Clique em "Dashboard" na página principal
@@ -150,6 +147,33 @@ O sistema verifica se o usuário pertence aos grupos configurados no Active Dire
 2. **Exemplo**: `LDAP_ALLOWED_GROUPS=Domain Admins,Administradores,TI`
 3. **Funcionalidade**: Apenas usuários dos grupos especificados poderão fazer login no sistema
 
+### Configuração de Usuário e Senha Local
+O sistema utiliza autenticação local como fallback. Para configurar o usuário e senha:
+
+1. **Editar arquivo**: `interface/init.sql`
+2. **Localizar linha**: `INSERT IGNORE INTO local_users (username, password_hash, email, full_name, role) VALUES`
+3. **Alterar usuário**: Substituir `'admin'` pelo nome de usuário desejado
+4. **Gerar hash da senha**: Use um gerador de hash bcrypt online ou execute:
+   ```php
+   <?php echo password_hash('sua_senha_aqui', PASSWORD_BCRYPT); ?>
+   ```
+5. **Substituir hash**: Trocar o hash bcrypt existente pelo novo hash gerado
+6. **Exemplo**:
+   ```sql
+   INSERT IGNORE INTO local_users (username, password_hash, email, full_name, role) VALUES 
+   ('seu_usuario', '$2a$12$novo_hash_aqui', 'usuario@empresa.com', 'Nome Completo', 'admin');
+   ```
+
+**⚠️ Exemplo Prático**:
+Para criar um usuário "ti_admin" com senha "MinhaSenha@2024":
+1. Gere o hash: `<?php echo password_hash('MinhaSenha@2024', PASSWORD_BCRYPT); ?>`
+2. Resultado: `$2y$10$...` (hash único)
+3. Use no SQL:
+   ```sql
+   INSERT IGNORE INTO local_users (username, password_hash, email, full_name, role) VALUES 
+   ('ti_admin', '$2y$10$hash_gerado_aqui', 'ti@empresa.com', 'Administrador TI', 'admin');
+   ```
+
 ### Deploy com Docker
 ```bash
 # Clone o repositório
@@ -189,9 +213,10 @@ docker-compose up -d
 
 ### Boas Práticas
 - **Senhas Fortes**: Exigência de complexidade mínima
-- **Alteração Obrigatória**: Força troca da senha padrão
+- **Configuração Segura**: Sempre altere o usuário e senha padrão no `init.sql`
 - **Controle de Acesso**: Verificação de autenticação em todas as páginas
 - **Auditoria**: Registro de ações importantes
+- **Hash Seguro**: Use sempre hash bcrypt para senhas locais
 
 ## 🎨 Interface e UX
 
