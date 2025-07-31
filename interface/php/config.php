@@ -1,11 +1,50 @@
 <?php
 
+// Função para carregar variáveis do arquivo .env
+if (!function_exists('loadEnvFile')) {
+    function loadEnvFile($filePath) {
+        if (!file_exists($filePath)) {
+            return;
+        }
+        
+        $lines = file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        foreach ($lines as $line) {
+            // Ignorar comentários e linhas vazias
+            if (strpos(trim($line), '#') === 0 || empty(trim($line))) {
+                continue;
+            }
+            
+            // Verificar se a linha contém um sinal de igual
+            if (strpos($line, '=') !== false) {
+                list($key, $value) = explode('=', $line, 2);
+                $key = trim($key);
+                $value = trim($value);
+                
+                // Remover aspas se existirem
+                if ((substr($value, 0, 1) === '"' && substr($value, -1) === '"') ||
+                    (substr($value, 0, 1) === "'" && substr($value, -1) === "'")) {
+                    $value = substr($value, 1, -1);
+                }
+                
+                // Definir a variável de ambiente se não estiver definida
+                if (!getenv($key)) {
+                    putenv("$key=$value");
+                }
+            }
+        }
+    }
+}
+
+// Carregar variáveis do arquivo .env
+loadEnvFile(__DIR__ . '/.env');
+
 // Configurações do banco de dados - Lendo diretamente das variáveis de ambiente
 $config = [
     'host' => getenv('DB_HOST') ?: 'db',
     'user' => getenv('DB_USER') ?: 'root',
     'password' => getenv('DB_PASSWORD') ?: '',
-    'dbname' => getenv('DB_NAME') ?: 'laps'
+    'dbname' => getenv('DB_NAME') ?: 'laps',
+    'glpi_url' => getenv('GLPI_URL') ?: 'https://glpi.exemplo.com'
 ];
 
 // Função para carregar configurações LDAP de forma segura

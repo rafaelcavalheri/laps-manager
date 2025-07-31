@@ -282,7 +282,7 @@ if (file_exists($logFile)) {
                     <button class="copy-btn" onclick="copyToClipboard('<?= htmlspecialchars($r['Password'] ?? '') ?>')">
                       <i class="far fa-copy"></i>
                     </button>
-                    <a href="https://glpi.mogimirim.sp.gov.br/front/computer.php?is_deleted=0&as_map=0&browse=0&criteria%5B0%5D%5Blink%5D=AND&criteria%5B0%5D%5Bfield%5D=view&criteria%5B0%5D%5Bsearchtype%5D=contains&criteria%5B0%5D%5Bvalue%5D=<?= urlencode($r['ComputerName']) ?>&itemtype=Computer&start=0" 
+                    <a href="<?= htmlspecialchars(rtrim($config['glpi_url'], '/')) ?>/front/computer.php?is_deleted=0&as_map=0&browse=0&criteria%5B0%5D%5Blink%5D=AND&criteria%5B0%5D%5Bfield%5D=view&criteria%5B0%5D%5Bsearchtype%5D=contains&criteria%5B0%5D%5Bvalue%5D=<?= urlencode($r['ComputerName']) ?>&itemtype=Computer&start=0" 
                       class="btn glpi-btn" target="_blank" title="Ver no GLPI">
                       <i class="fa fa-desktop" aria-hidden="true"></i>
                     </a>

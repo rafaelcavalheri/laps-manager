@@ -108,7 +108,7 @@ laps/
 
 ### Integração
 - **Active Directory**: Sincronização automática via LDAP
-- **GLPI**: Integração para gestão de ativos
+- **GLPI**: Integração para gestão de ativos (configurável via GLPI_URL)
 - **Banco de Dados**: Armazenamento seguro de senhas e histórico
 
 ## 🔧 Configuração
@@ -128,7 +128,17 @@ LDAP_SERVER=ldap://seu-servidor
 LDAP_BASE_DN=DC=exemplo,DC=com
 LDAP_USER=usuario_ldap
 LDAP_PASS=senha_ldap
+
+# Configurações GLPI
+GLPI_URL=https://glpi.exemplo.com
 ```
+
+### Configuração do GLPI
+O sistema integra-se ao GLPI para permitir visualização dos computadores no sistema de gestão de ativos. Para configurar:
+
+1. **URL do GLPI**: Configure a variável `GLPI_URL` no arquivo `.env`
+2. **Exemplo**: `GLPI_URL=https://glpi.sua-empresa.com`
+3. **Funcionalidade**: O botão "Ver no GLPI" na tabela de senhas abrirá o computador correspondente no GLPI
 
 ### Deploy com Docker
 ```bash
