@@ -23,3 +23,6 @@ sessions/
 # Arquivos de backup
 *.bak
 *.backup
+
+#Arquivos de banco
+*.sql

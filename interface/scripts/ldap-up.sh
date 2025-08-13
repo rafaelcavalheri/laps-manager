@@ -29,7 +29,7 @@ log "LDAP_SERVER: $LDAP_SERVER"
 export MYSQL_PWD="$DB_PASSWORD"
 
 # Cria a tabela temporária
-mysql -h "$DB_HOST" -u "$DB_USER" "$DB_NAME" <<EOF
+mysql --ssl=0 -h "$DB_HOST" -u "$DB_USER" "$DB_NAME" <<EOF
 DROP TABLE IF EXISTS TempPasswords;
 CREATE TABLE TempPasswords (
     ComputerName VARCHAR(255),
@@ -111,7 +111,7 @@ done < "$TEMP_LDAP_FILE_ALL"
 
 # Carrega dados temporários (computadores COM senha)
 if [[ -s "$TEMP_FILE" ]]; then
-    mysql -h "$DB_HOST" -u "$DB_USER" "$DB_NAME" <<EOF
+    mysql --ssl=0 -h "$DB_HOST" -u "$DB_USER" "$DB_NAME" <<EOF
 LOAD DATA LOCAL INFILE '$TEMP_FILE'
 INTO TABLE TempPasswords
 FIELDS TERMINATED BY ',' ENCLOSED BY "'"
@@ -121,7 +121,7 @@ fi
 
 # Carrega dados temporários (computadores SEM senha)
 if [[ -s "$TEMP_FILE_NO_PASSWORD" ]]; then
-    mysql -h "$DB_HOST" -u "$DB_USER" "$DB_NAME" <<EOF
+    mysql --ssl=0 -h "$DB_HOST" -u "$DB_USER" "$DB_NAME" <<EOF
 LOAD DATA LOCAL INFILE '$TEMP_FILE_NO_PASSWORD'
 INTO TABLE TempPasswords
 FIELDS TERMINATED BY ',' ENCLOSED BY "'"
@@ -133,7 +133,7 @@ fi
 rm -f "$TEMP_LDAP_FILE" "$TEMP_LDAP_FILE_ALL" "$TEMP_FILE" "$TEMP_FILE_NO_PASSWORD"
 
 # Atualiza o banco de dados
-mysql -h "$DB_HOST" -u "$DB_USER" "$DB_NAME" <<EOF
+mysql --ssl=0 -h "$DB_HOST" -u "$DB_USER" "$DB_NAME" <<EOF
 
 -- 1. Limpa ManualPassword APENAS se houver nova senha do LAPS (diferente da atual)
 UPDATE Passwords p
