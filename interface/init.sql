@@ -91,10 +91,40 @@ CREATE TABLE IF NOT EXISTS local_users (
 INSERT IGNORE INTO local_users (username, password_hash, email, full_name, role) VALUES 
 ('admin', '$2a$12$.ntwFWSA.pFnHyU6qNgqIuYy6RFOguEju4CCsItZ8QTArmDtc4nNG', 'admin@laps.local', 'Administrador Local', 'admin');
 
+-- Tabela de chaves de API
+CREATE TABLE IF NOT EXISTS api_keys (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    api_key VARCHAR(64) NOT NULL UNIQUE,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    last_used_at TIMESTAMP NULL,
+    permissions TEXT NULL,
+    ip_whitelist TEXT NULL,
+    expires_at TIMESTAMP NULL,
+    INDEX idx_api_key (api_key),
+    INDEX idx_is_active (is_active),
+    INDEX idx_expires_at (expires_at)
+);
+
+-- Tabela de logs de API
+CREATE TABLE IF NOT EXISTS api_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    api_key_id INT,
+    endpoint VARCHAR(255),
+    ip_address VARCHAR(45),
+    user_agent TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (api_key_id) REFERENCES api_keys(id) ON DELETE CASCADE,
+    INDEX idx_api_key_id (api_key_id),
+    INDEX idx_created_at (created_at)
+);
+
 -- Criar usuário personalizado se especificado no .env
 -- Este comando será executado dinamicamente pelo Dockerfile
 -- CREATE USER IF NOT EXISTS '${DB_USER}'@'%' IDENTIFIED BY '${DB_PASSWORD}';
 -- GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'%';
 -- FLUSH PRIVILEGES;
 
-COMMIT; 
+COMMIT;

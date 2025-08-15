@@ -324,35 +324,45 @@ $userInfo = [
             }
         }
 
-        // Validar confirmação de senha em tempo real
-        document.getElementById('confirm_password').addEventListener('input', function() {
-            const newPassword = document.getElementById('new_password').value;
-            const confirmPassword = this.value;
+        // Aguardar o DOM estar completamente carregado
+        document.addEventListener('DOMContentLoaded', function() {
+            // Validar confirmação de senha em tempo real
+            const confirmPasswordField = document.getElementById('confirm_password');
+            const newPasswordField = document.getElementById('new_password');
+            
+            if (confirmPasswordField) {
+                confirmPasswordField.addEventListener('input', function() {
+                    const newPassword = newPasswordField ? newPasswordField.value : '';
+                    const confirmPassword = this.value;
 
-            if (confirmPassword && newPassword !== confirmPassword) {
-                this.setCustomValidity('As senhas não coincidem');
-            } else {
-                this.setCustomValidity('');
+                    if (confirmPassword && newPassword !== confirmPassword) {
+                        this.setCustomValidity('As senhas não coincidem');
+                    } else {
+                        this.setCustomValidity('');
+                    }
+                });
             }
-        });
 
-        // Validar força da senha em tempo real
-        document.getElementById('new_password').addEventListener('input', function() {
-            const password = this.value;
-            const hasLower = /[a-z]/.test(password);
-            const hasUpper = /[A-Z]/.test(password);
-            const hasNumber = /\d/.test(password);
-            const hasSpecial = /[@$!%*?&]/.test(password);
-            const isLongEnough = password.length >= 8;
+            // Validar força da senha em tempo real
+            if (newPasswordField) {
+                newPasswordField.addEventListener('input', function() {
+                    const password = this.value;
+                    const hasLower = /[a-z]/.test(password);
+                    const hasUpper = /[A-Z]/.test(password);
+                    const hasNumber = /\d/.test(password);
+                    const hasSpecial = /[@$!%*?&]/.test(password);
+                    const isLongEnough = password.length >= 8;
 
-            let message = '';
-            if (!isLongEnough) message += 'Mínimo 8 caracteres. ';
-            if (!hasLower) message += 'Uma letra minúscula. ';
-            if (!hasUpper) message += 'Uma letra maiúscula. ';
-            if (!hasNumber) message += 'Um número. ';
-            if (!hasSpecial) message += 'Um caractere especial (@$!%*?&). ';
+                    let message = '';
+                    if (!isLongEnough) message += 'Mínimo 8 caracteres. ';
+                    if (!hasLower) message += 'Uma letra minúscula. ';
+                    if (!hasUpper) message += 'Uma letra maiúscula. ';
+                    if (!hasNumber) message += 'Um número. ';
+                    if (!hasSpecial) message += 'Um caractere especial (@$!%*?&). ';
 
-            this.setCustomValidity(message);
+                    this.setCustomValidity(message);
+                });
+            }
         });
     </script>
 </body>

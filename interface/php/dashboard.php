@@ -188,9 +188,14 @@ if (file_exists($logFile)) {
                             <?= htmlspecialchars($_SESSION['username'] ?? 'N/A') ?>
                         </a>
                     </div>
-                    <button onclick="logout()" class="btn logout-btn" title="Sair do sistema">
-                        <i class="fas fa-sign-out-alt"></i>
-                    </button>
+                    <div class="user-actions">
+                        <button onclick="window.location.href='api_keys.php'" class="btn api-btn" title="Gerenciar Chaves de API">
+                            <i class="fas fa-key"></i> API
+                        </button>
+                        <button onclick="logout()" class="btn logout-btn" title="Sair do sistema">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
             <div class="status-bar">
@@ -537,4 +542,4 @@ if (file_exists($logFile)) {
         }
     </script>
 </body>
-</html> 
+</html>
