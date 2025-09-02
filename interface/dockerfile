@@ -61,9 +61,8 @@ RUN chown www-data:www-data /usr/local/bin/ldap-up.sh && \
 # Define permissões para o diretório da aplicação
 RUN chown -R www-data:www-data /var/www/html
 
-# Garante que o arquivo ldap_settings.php tenha permissões corretas
-RUN chmod 664 /var/www/html/ldap_settings.php
-
+# Garante que o arquivo ldap_settings.php tenha permissões corretas (se existir)
+RUN if [ -f /var/www/html/ldap_settings.php ]; then chmod 664 /var/www/html/ldap_settings.php; fi
 
 # Configura o cron job para executar o script a cada 1 hora
 RUN echo "0 * * * * root /usr/local/bin/ldap-up.sh" > /etc/cron.d/ldap-up-cron

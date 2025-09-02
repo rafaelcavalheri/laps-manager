@@ -10,9 +10,6 @@ debug_*.php
 .env.local
 .env.production
 
-# Arquivos de configuração sensíveis
-ldap_settings.php
-
 # Arquivos de sessão
 sessions/
 

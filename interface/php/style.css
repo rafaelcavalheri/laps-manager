@@ -372,6 +372,160 @@ body {
     box-shadow: 0 4px 6px -1px rgba(44, 164, 68, 0.2);
 }
 
+/* Estilos para o alfabeto guia */
+.alphabet-guide {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 4px var(--shadow-color);
+}
+
+.alphabet-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.alphabet-title span::before {
+    content: "🔤";
+    font-size: 1.2rem;
+    margin-right: 0.5rem;
+}
+
+.alphabet-toggle-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-size: 0.9rem;
+}
+
+.alphabet-toggle-btn:hover {
+    background: var(--success);
+    transform: scale(1.1);
+}
+
+.alphabet-chars {
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.alphabet-guide.collapsed .alphabet-chars {
+    max-height: 0;
+    opacity: 0;
+    margin-bottom: 0;
+}
+
+.alphabet-chars {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.char-group {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.char-label {
+    font-weight: 600;
+    color: var(--primary);
+    min-width: 140px;
+    font-size: 0.9rem;
+}
+
+.char-item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    background: var(--light);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-color);
+    transition: all var(--transition-fast);
+}
+
+.char-item.highlight {
+    background: var(--warning);
+    color: white;
+    border-color: var(--warning);
+    box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+}
+
+.char-item:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px var(--shadow-color);
+}
+
+.alphabet-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: rgba(6, 182, 212, 0.1);
+    border: 1px solid rgba(6, 182, 212, 0.2);
+    border-radius: 4px;
+    font-size: 0.9rem;
+    color: var(--text-color);
+}
+
+.alphabet-note i {
+    color: var(--info);
+    margin-top: 0.1rem;
+    flex-shrink: 0;
+}
+
+.alphabet-note strong {
+    color: var(--warning);
+    font-weight: 600;
+}
+
+/* Responsividade para o alfabeto guia */
+@media (max-width: 768px) {
+    .alphabet-chars {
+        gap: 0.75rem;
+    }
+    
+    .char-group {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .char-label {
+        min-width: auto;
+        margin-bottom: 0.25rem;
+    }
+    
+    .char-item {
+        width: 1.75rem;
+        height: 1.75rem;
+        font-size: 0.9rem;
+    }
+}
+
 .results-table {
     width: 100%;
     border-collapse: collapse;
@@ -416,7 +570,7 @@ body {
 }
 
 .password-text {
-    font-family: 'Consolas', monospace;
+    font-family: 'Courier New', monospace;
     font-size: 0.9rem;
     letter-spacing: 0.5px;
     padding: 0.25rem 0.5rem;
@@ -1184,7 +1338,7 @@ a:visited {
     background: var(--bg-color);
     padding: 0.25rem 0.5rem;
     border-radius: 4px;
-    font-family: monospace;
+    font-family: 'Courier New', monospace;
     font-size: 0.9rem;
     border: 1px solid var(--card-border);
 }
@@ -1238,7 +1392,7 @@ a:visited {
     background: var(--card-bg);
     padding: 0.5rem;
     border-radius: 4px;
-    font-family: monospace;
+    font-family: 'Courier New', monospace;
     word-break: break-all;
     display: inline-block;
     margin: 0.5rem 0;

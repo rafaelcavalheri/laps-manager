@@ -256,6 +256,93 @@ if (file_exists($logFile)) {
     
     <main class="main-content">
       <?php if ($rows): ?>
+        <!-- Alfabeto Guia -->
+        <div class="alphabet-guide" id="alphabetGuide">
+          <div class="alphabet-title">
+            <span>Guia de Caracteres:</span>
+            <button type="button" class="alphabet-toggle-btn" onclick="toggleAlphabetGuide()" title="Mostrar/Esconder guia">
+              <i class="fas fa-chevron-up" id="alphabetToggleIcon"></i>
+            </button>
+          </div>
+          <div class="alphabet-chars">
+            <span class="char-group">
+              <span class="char-label">Números:</span>
+              <span class="char-item">0</span>
+              <span class="char-item">1</span>
+              <span class="char-item">2</span>
+              <span class="char-item">3</span>
+              <span class="char-item">4</span>
+              <span class="char-item">5</span>
+              <span class="char-item">6</span>
+              <span class="char-item">7</span>
+              <span class="char-item">8</span>
+              <span class="char-item">9</span>
+            </span>
+            <span class="char-group">
+              <span class="char-label">Letras Maiúsculas:</span>
+              <span class="char-item">A</span>
+              <span class="char-item">B</span>
+              <span class="char-item">C</span>
+              <span class="char-item">D</span>
+              <span class="char-item">E</span>
+              <span class="char-item">F</span>
+              <span class="char-item">G</span>
+              <span class="char-item">H</span>
+              <span class="char-item highlight">I</span>
+              <span class="char-item">J</span>
+              <span class="char-item">K</span>
+              <span class="char-item">L</span>
+              <span class="char-item">M</span>
+              <span class="char-item">N</span>
+              <span class="char-item highlight">O</span>
+              <span class="char-item">P</span>
+              <span class="char-item">Q</span>
+              <span class="char-item">R</span>
+              <span class="char-item">S</span>
+              <span class="char-item">T</span>
+              <span class="char-item">U</span>
+              <span class="char-item">V</span>
+              <span class="char-item">W</span>
+              <span class="char-item">X</span>
+              <span class="char-item">Y</span>
+              <span class="char-item">Z</span>
+            </span>
+            <span class="char-group">
+              <span class="char-label">Letras Minúsculas:</span>
+              <span class="char-item">a</span>
+              <span class="char-item">b</span>
+              <span class="char-item">c</span>
+              <span class="char-item">d</span>
+              <span class="char-item">e</span>
+              <span class="char-item">f</span>
+              <span class="char-item">g</span>
+              <span class="char-item">h</span>
+              <span class="char-item highlight">i</span>
+              <span class="char-item highlight">l</span>
+              <span class="char-item">j</span>
+              <span class="char-item">k</span>
+              <span class="char-item">m</span>
+              <span class="char-item">n</span>
+              <span class="char-item highlight">o</span>
+              <span class="char-item">p</span>
+              <span class="char-item">q</span>
+              <span class="char-item">r</span>
+              <span class="char-item">s</span>
+              <span class="char-item">t</span>
+              <span class="char-item">u</span>
+              <span class="char-item">v</span>
+              <span class="char-item">w</span>
+              <span class="char-item">x</span>
+              <span class="char-item">y</span>
+              <span class="char-item">z</span>
+            </span>
+          </div>
+          <div class="alphabet-note">
+            <i class="fas fa-info-circle"></i>
+            <span>Caracteres destacados podem ser confundidos: <strong>0 (zero), O (ó maiúsculo), o (ó minúsculo)</strong> e <strong>1 (um), I (i maiúsculo), i (i minúsculo), l (L minúsculo)</strong></span>
+          </div>
+        </div>
+        
         <table class="results-table">
           <thead>
             <tr>
@@ -464,6 +551,34 @@ if (file_exists($logFile)) {
         .then(() => alert('Copiado para a área de transferência!'))
         .catch(() => alert('Erro ao copiar.'));
     }
+
+    function toggleAlphabetGuide() {
+      const guide = document.getElementById('alphabetGuide');
+      const icon = document.getElementById('alphabetToggleIcon');
+      
+      guide.classList.toggle('collapsed');
+      
+      if (guide.classList.contains('collapsed')) {
+        icon.className = 'fas fa-chevron-down';
+      } else {
+        icon.className = 'fas fa-chevron-up';
+      }
+      
+      // Salvar estado no localStorage
+      localStorage.setItem('alphabetGuideCollapsed', guide.classList.contains('collapsed'));
+    }
+
+    // Restaurar estado do guia ao carregar a página
+    document.addEventListener('DOMContentLoaded', function() {
+      const isCollapsed = localStorage.getItem('alphabetGuideCollapsed') === 'true';
+      const guide = document.getElementById('alphabetGuide');
+      const icon = document.getElementById('alphabetToggleIcon');
+      
+      if (isCollapsed) {
+        guide.classList.add('collapsed');
+        icon.className = 'fas fa-chevron-down';
+      }
+    });
 
     function logout(){
       if (confirm('Deseja realmente sair do sistema?')) {
