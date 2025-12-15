@@ -723,14 +723,27 @@ body {
 }
 
 @media (max-width: 768px) {
+  :root { --mobile-header-h: 160px; }
   .container {
     padding: 1rem;
-    margin: 1rem;
+    margin: 0.25rem;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding-top: var(--mobile-header-h);
   }
 
-    .header {
-        padding: 1rem;
-    }
+  .header {
+      padding: 1rem;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
+      background: var(--bg-color);
+      backdrop-filter: blur(2px);
+      border-bottom: 1px solid var(--card-border);
+  }
 
     .form-group {
         flex-direction: row;
@@ -740,10 +753,10 @@ body {
   .search-input {
     width: 100%;
     max-width: none;
-    height: 24px !important;
-    line-height: 24px !important;
-    padding: 2px 8px !important;
-    font-size: 13px !important;
+    height: 40px !important;
+    line-height: 40px !important;
+    padding: 8px 12px !important;
+    font-size: 15px !important;
     box-shadow: none;
     border-width: 1px;
     -webkit-appearance: none;
@@ -799,6 +812,9 @@ body {
   display: grid;
   grid-template-columns: 1fr;
   gap: 12px;
+  margin-left: 0;
+  margin-right: 0;
+  padding-top: 8px;
 }
 
 .pc-card {
@@ -854,6 +870,13 @@ body {
 
 @media (max-width: 768px) {
   .search-form { margin-top: 0.5rem; }
+  .main-content { flex: 0 0 auto; height: calc(100vh - var(--mobile-header-h)); overflow-y: auto; -webkit-overflow-scrolling: touch; padding-top: 10px; }
+  .filter-indicator { display: none; }
+
+  .search-form .search-input { width: 85% !important; margin: 0 auto; }
+  .search-form .search-btn { width: 85% !important; margin: 0 auto; display: flex; justify-content: center; align-items: center; }
+  .search-form .search-btn i { margin-right: 8px; }
+}
   .pc-actions { flex-wrap: nowrap; }
   .search-input { flex: 0 0 auto !important; }
   .pc-password.visible {
@@ -875,12 +898,13 @@ body {
 /* Versão app móvel: ações em linha e botão buscar abaixo */
 @media (max-width: 768px) {
   .form-group { flex-direction: column; align-items: stretch; gap: 8px; }
-  .search-btn { width: 100%; height: 24px !important; padding: 2px 8px !important; border-radius: 8px; font-size: 0.9rem; }
-  .search-btn i { font-size: 12px; margin-right: 6px; }
+  .search-btn { width: 100%; height: 40px !important; padding: 8px 12px !important; border-radius: 8px; font-size: 1rem; }
+  .search-btn i { font-size: 16px; margin-right: 6px; }
 
-  .pc-actions { display: grid; grid-template-columns: 1fr 24px 24px; gap: 6px; align-items: start; }
-  .copy-btn, .toggle-password-btn { width: 24px; height: 24px; }
-  .toggle-password-btn i, .copy-btn i { font-size: 14px; }
+  .pc-card-row { gap: 6px; }
+  .pc-actions { display: grid; grid-template-columns: 1fr 20px 20px; gap: 4px; align-items: start; }
+  .copy-btn, .toggle-password-btn { width: 20px; height: 20px; }
+  .toggle-password-btn i, .copy-btn i { font-size: 12px; }
 }
 }
 
