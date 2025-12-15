@@ -894,10 +894,10 @@ body {
   .pc-card-row { gap: 4px; justify-content: flex-start; }
   .pc-card .pc-card-row { display: grid; grid-template-columns: 28px 1fr; align-items: center; }
 
-  .pc-actions { display: grid; grid-template-columns: minmax(0,1fr) 18px 18px; column-gap: 2px; align-items: center; }
+  .pc-actions { display: grid; grid-template-columns: minmax(0,1fr) 22px 22px; column-gap: 2px; align-items: center; }
   .pc-actions .pc-password { min-width: 0; }
-  .copy-btn, .toggle-password-btn { width: 18px; height: 18px; }
-  .toggle-password-btn i, .copy-btn i { font-size: 14px; }
+  .copy-btn, .toggle-password-btn { width: 22px; height: 22px; }
+  .toggle-password-btn i, .copy-btn i { font-size: 16px; }
   .pc-password { padding: 2px 4px; }
   .results-cards.mobile-only { display: grid; }
   .results-table.desktop-only { display: none !important; }

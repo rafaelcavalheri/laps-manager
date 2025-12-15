@@ -47,11 +47,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $computerName = sanitizeInput($postData['computer'], 'string');
         $manualPassword = sanitizeInput($postData['manual_password'], 'string');
         
-        $stmt = $conn->prepare("
-            INSERT INTO ComputerManualPasswords (ComputerName, ManualPassword)
-            VALUES (?, ?)
-            ON DUPLICATE KEY UPDATE ManualPassword = VALUES(ManualPassword)
-        ");
+        // Garantir colunas de timestamp na tabela de senhas manuais
+        $conn->query("CREATE TABLE IF NOT EXISTS ComputerManualPasswords (ComputerName VARCHAR(255) PRIMARY KEY, ManualPassword TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP)");
+
+        $stmt = $conn->prepare("\n            INSERT INTO ComputerManualPasswords (ComputerName, ManualPassword)\n            VALUES (?, ?)\n            ON DUPLICATE KEY UPDATE ManualPassword = VALUES(ManualPassword), updated_at = NOW()\n        ");
         $stmt->bind_param('ss', $computerName, $manualPassword);
         $stmt->execute();
         $stmt->close();
@@ -80,6 +79,13 @@ $conn = new mysqli(
 );
 if ($conn->connect_error) {
     die("Erro na conexão: " . $conn->connect_error);
+}
+
+// Desktop: limpeza automática de senhas manuais obsoletas
+if (!($isMobile ?? false)) {
+    $conn->query("CREATE TABLE IF NOT EXISTS ComputerManualPasswords (ComputerName VARCHAR(255) PRIMARY KEY, ManualPassword TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP)");
+    $cleanupSql = "DELETE m FROM ComputerManualPasswords m INNER JOIN Passwords p ON p.ComputerName = m.ComputerName WHERE p.ExpirationTimestamp IS NOT NULL AND m.created_at IS NOT NULL AND p.ExpirationTimestamp > m.created_at";
+    $conn->query($cleanupSql);
 }
 
 // Sanitizar parâmetros GET
@@ -391,15 +397,19 @@ if (file_exists($logFile)) {
                 <td>
                   <?php 
                     $exp = $r['ExpirationTimestamp'] ?? '';
-                    $statusClass = 'status-ok';
+                    $statusClass = '';
                     $title = '';
                     if ($exp) {
-                      $now = new DateTime('now');
-                      $expDt = new DateTime($exp);
-                      $diff = (int)$now->diff($expDt)->format('%r%a');
-                      if ($diff < 0) { $statusClass = 'status-expired'; }
-                      elseif ($diff <= 7) { $statusClass = 'status-warn'; }
-                      else { $statusClass = 'status-ok'; }
+                      $today = new DateTime(date('Y-m-d'));
+                      $expDt = new DateTime((new DateTime($exp))->format('Y-m-d'));
+                      $diff = (int)$today->diff($expDt)->format('%r%a');
+                      if ($diff < 0) {
+                        $statusClass = 'status-expired';
+                      } elseif ($diff === 7) {
+                        $statusClass = 'status-ok';
+                      } elseif ($diff >= 0 && $diff < 7) {
+                        $statusClass = 'status-warn';
+                      }
                       $title = ($diff < 0) ? 'Expirada' : ($diff.' dias');
                     }
                   ?>
@@ -477,15 +487,19 @@ if (file_exists($logFile)) {
               <span class="pc-label"><i class="fas fa-calendar-day"></i></span>
               <?php 
                 $exp = $r['ExpirationTimestamp'] ?? '';
-                $statusClass = 'status-ok';
+                $statusClass = '';
                 $title = '';
                 if ($exp) {
-                  $now = new DateTime('now');
-                  $expDt = new DateTime($exp);
-                  $diff = (int)$now->diff($expDt)->format('%r%a');
-                  if ($diff < 0) { $statusClass = 'status-expired'; }
-                  elseif ($diff <= 7) { $statusClass = 'status-warn'; }
-                  else { $statusClass = 'status-ok'; }
+                  $today = new DateTime(date('Y-m-d'));
+                  $expDt = new DateTime((new DateTime($exp))->format('Y-m-d'));
+                  $diff = (int)$today->diff($expDt)->format('%r%a');
+                  if ($diff < 0) {
+                    $statusClass = 'status-expired';
+                  } elseif ($diff === 7) {
+                    $statusClass = 'status-ok';
+                  } elseif ($diff >= 0 && $diff < 7) {
+                    $statusClass = 'status-warn';
+                  }
                   $title = ($diff < 0) ? 'Expirada' : ($diff.' dias');
                 }
               ?>
