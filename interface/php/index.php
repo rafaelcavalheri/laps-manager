@@ -138,7 +138,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (authenticateLocalUser($username, $password)) {
                 // Login local bem-sucedido
                 recordLoginAttempt($userIP, $username, true);
-                header("Location: dashboard.php");
+                // Redirecionar para página apropriada conforme dispositivo
+                $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+                $isMobile = preg_match('/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i', $ua);
+                header("Location: " . ($isMobile ? 'view_laps.php' : 'dashboard.php'));
                 exit();
             } else {
                 recordLoginAttempt($userIP, $username, false);
@@ -156,7 +159,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['username'] = $username;
                 $_SESSION['authenticated'] = true;
                 $_SESSION['auth_type'] = 'ldap';
-                header("Location: dashboard.php");
+                // Redirecionar para página apropriada conforme dispositivo
+                $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+                $isMobile = preg_match('/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i', $ua);
+                header("Location: " . ($isMobile ? 'view_laps.php' : 'dashboard.php'));
                 exit();
             } else {
                 // Mensagem de erro

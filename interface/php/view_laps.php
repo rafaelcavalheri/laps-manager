@@ -90,6 +90,10 @@ $showNull = isset($getData['show_null_passwords']);
 $showOld  = isset($getData['show_old_passwords']);
 $filter = sanitizeInput($getData['filter'] ?? '', 'string');
 
+// Detectar dispositivo móvel
+$ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+$isMobile = preg_match('/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i', $ua);
+
 $allowedCols = ['ComputerName','Password','ExpirationTimestamp','ManualPassword'];
 $orderBy  = in_array($getData['orderby'] ?? '', $allowedCols) ? $getData['orderby'] : 'ComputerName';
 $orderDir = ($getData['orderdir'] ?? '') === 'DESC' ? 'DESC' : 'ASC';
@@ -144,13 +148,16 @@ if (!empty($whereConditions)) {
 
 $sql .= " ORDER BY {$orderBy} {$orderDir}";
 
-$stmt = $conn->prepare($sql);
-if ($types) {
-    $stmt->bind_param($types, ...$params);
+$rows = [];
+if (!($isMobile && $computerNameFilter === '')) {
+    $stmt = $conn->prepare($sql);
+    if ($types) {
+        $stmt->bind_param($types, ...$params);
+    }
+    $stmt->execute();
+    $rows = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
 }
-$stmt->execute();
-$rows = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-$stmt->close();
 $conn->close();
 
 function toggle($d) { return $d === 'ASC' ? 'DESC' : 'ASC'; }
@@ -197,9 +204,9 @@ if (file_exists($logFile)) {
       <div class="title">
         <div class="title-left">
           <img src="./img/lap.png" class="logo" alt="LAPS" onclick="alert('Versão: <?= $version ?>')">
-          <h1 class="custom-title">Gerenciador de Senhas LAPS</h1>
+          <h1 class="custom-title"><?= $isMobile ? 'GSLaps' : 'Gerenciador de Senhas LAPS' ?></h1>
         </div>
-        <div class="user-section-title">
+        <div class="user-section-title desktop-only">
           <div class="user-info-title">
             <i class="fas fa-user"></i> 
             <a href="profile.php" class="user-profile-link" title="Ver perfil">
@@ -216,7 +223,7 @@ if (file_exists($logFile)) {
           </div>
         </div>
       </div>
-      <div class="status-bar">
+      <div class="status-bar desktop-only">
         <div class="update-status">
           <i class="fas fa-clock"></i> Atualizado: <?= htmlspecialchars($lastUpdate) ?>
         </div>
@@ -232,7 +239,7 @@ if (file_exists($logFile)) {
       <form method="get" class="search-form">
         <div class="form-group">
           <input type="text" name="computername" class="search-input" value="<?= htmlspecialchars($computerNameFilter) ?>" placeholder="Nome do computador">
-          <div class="filters">
+          <div class="filters desktop-only">
             <label class="filter-option">
               <input type="checkbox" name="show_old_passwords" <?= $showOld ? 'checked' : '' ?>> Senhas Antigas
             </label>
@@ -343,7 +350,7 @@ if (file_exists($logFile)) {
           </div>
         </div>
         
-        <table class="results-table">
+        <table class="results-table desktop-only">
           <thead>
             <tr>
               <?php foreach ($allowedCols as $col): 
@@ -418,9 +425,53 @@ if (file_exists($logFile)) {
           </tbody>
         </table>
       <?php else: ?>
+        <?php if (!($isMobile && $computerNameFilter === '')): ?>
         <div class="empty-state">
           <i class="fas fa-info-circle"></i> Nenhum registro encontrado.
         </div>
+        <?php endif; ?>
+      <?php endif; ?>
+
+      <?php if ($rows): ?>
+      <div class="results-cards mobile-only">
+        <?php foreach ($rows as $r): ?>
+          <div class="pc-card">
+            <div class="pc-card-row">
+              <span class="pc-label"><i class="fas fa-desktop"></i></span>
+              <span class="pc-value"><?= htmlspecialchars($r['ComputerName'] ?? '') ?></span>
+            </div>
+            <div class="pc-card-row">
+              <span class="pc-label"><i class="fas fa-key"></i></span>
+              <div class="pc-actions">
+                <span class="pc-password <?= ($r['Password'] ?? '') !== '' ? '' : 'empty' ?>"><?= htmlspecialchars($r['Password'] ?? '') ?></span>
+                <button class="toggle-password-btn" onclick="togglePassword(this)"><i class="far fa-eye"></i></button>
+                <button class="copy-btn" onclick="copyToClipboard('<?= htmlspecialchars($r['Password'] ?? '') ?>')"><i class="far fa-copy"></i></button>
+              </div>
+            </div>
+            <div class="pc-card-row">
+              <span class="pc-label"><i class="fas fa-calendar-day"></i></span>
+              <span class="pc-value"><?= htmlspecialchars($r['ExpirationTimestamp'] ?? '') ?></span>
+            </div>
+            <div class="pc-card-row">
+              <span class="pc-label"><i class="fas fa-pen"></i></span>
+              <div class="pc-actions">
+                <span class="pc-password <?= ($r['ManualPassword'] ?? '') !== '' ? '' : 'empty' ?>"><?= htmlspecialchars($r['ManualPassword'] ?? '') ?></span>
+                <?php if ($r['ManualPassword'] !== null): ?>
+                  <button class="copy-btn" onclick="copyToClipboard('<?= htmlspecialchars($r['ManualPassword']) ?>')"><i class="far fa-copy"></i></button>
+                <?php else: ?>
+                  <button class="copy-btn" style="opacity:0.3;cursor:not-allowed;" disabled><i class="far fa-copy"></i></button>
+                <?php endif; ?>
+              </div>
+            </div>
+            <div class="pc-card-row desktop-only">
+              <a href="<?= htmlspecialchars(rtrim($config['glpi_url'], '/')) ?>/front/computer.php?is_deleted=0&as_map=0&browse=0&criteria%5B0%5D%5Blink%5D=AND&criteria%5B0%5D%5Bfield%5D=view&criteria%5B0%5D%5Bsearchtype%5D=contains&criteria%5B0%5D%5Bvalue%5D=<?= urlencode($r['ComputerName']) ?>&itemtype=Computer&start=0" 
+                 class="btn glpi-btn" target="_blank" title="Ver no GLPI">
+                <i class="fa fa-desktop" aria-hidden="true"></i> GLPI
+              </a>
+            </div>
+          </div>
+        <?php endforeach; ?>
+      </div>
       <?php endif; ?>
     </main>
   </div>
@@ -446,9 +497,10 @@ if (file_exists($logFile)) {
     });
     
     function togglePassword(button) {
-      const container = button.closest('.password-container');
-      const passwordText = container.querySelector('.password-text');
+      const container = button.closest('.password-container') || button.closest('.pc-actions');
+      const passwordText = container.querySelector('.password-text') || container.querySelector('.pc-password');
       const icon = button.querySelector('i');
+      if (!passwordText) return;
       passwordText.classList.toggle('visible');
       icon.className = passwordText.classList.contains('visible') ? 'far fa-eye-slash' : 'far fa-eye';
     }
