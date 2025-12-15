@@ -816,6 +816,7 @@ body {
   margin-right: 0;
   padding-top: 8px;
 }
+.results-cards.mobile-only { display: none; }
 
 .pc-card {
   background: var(--card-bg);
@@ -848,6 +849,11 @@ body {
   font-size: 0.95rem;
 }
 
+.status-pill { display: inline-flex; align-items: center; padding: 2px 6px; border-radius: 999px; font-size: 0.75rem; font-weight: 600; }
+.status-pill.status-ok { background: #e8f5e9; color: #1b5e20; }
+.status-pill.status-warn { background: #fff8e1; color: #f57f17; }
+.status-pill.status-expired { background: #ffebee; color: #b71c1c; }
+
 .pc-actions {
   display: flex;
   align-items: center;
@@ -860,8 +866,8 @@ body {
   border-radius: var(--radius);
   padding: 4px 8px;
   -webkit-text-security: disc;
-  max-width: 100%;
   width: 100%;
+  max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -870,42 +876,31 @@ body {
 
 @media (max-width: 768px) {
   .search-form { margin-top: 0.5rem; }
-  .main-content { flex: 0 0 auto; height: calc(100vh - var(--mobile-header-h)); overflow-y: auto; -webkit-overflow-scrolling: touch; padding-top: 10px; }
+  .main-content { flex: 0 0 auto; height: calc(100vh - var(--mobile-header-h)); overflow-y: auto; -webkit-overflow-scrolling: touch; padding-top: 12px; scroll-padding-top: calc(var(--mobile-header-h) + 8px); }
   .filter-indicator { display: none; }
 
-  .search-form .search-input { width: 85% !important; margin: 0 auto; }
-  .search-form .search-btn { width: 85% !important; margin: 0 auto; display: flex; justify-content: center; align-items: center; }
+  .search-form .search-input { width: 85% !important; margin: 0 auto; height: 32px; padding: 6px 10px; font-size: 0.95rem; }
+  .search-form .search-input { flex: 0 0 auto !important; }
+  .search-form .search-btn { width: 85% !important; margin: 0 auto; display: flex; justify-content: center; align-items: center; height: 32px; padding: 6px 10px !important; font-size: 0.95rem; }
   .search-form .search-btn i { margin-right: 8px; }
-}
-  .pc-actions { flex-wrap: nowrap; }
-  .search-input { flex: 0 0 auto !important; }
-  .pc-password.visible {
-    max-width: 100%;
-    white-space: normal;
-    overflow: visible;
-    text-overflow: clip;
-    word-break: break-all;
-  }
-  .password-text.visible {
-    max-width: 100%;
-    white-space: normal;
-    overflow: visible;
-    text-overflow: clip;
-    word-break: break-all;
-  }
 }
 
 /* Versão app móvel: ações em linha e botão buscar abaixo */
 @media (max-width: 768px) {
   .form-group { flex-direction: column; align-items: stretch; gap: 8px; }
-  .search-btn { width: 100%; height: 40px !important; padding: 8px 12px !important; border-radius: 8px; font-size: 1rem; }
+  .search-btn { width: 100%; height: 32px !important; padding: 6px 10px !important; border-radius: 8px; font-size: 0.95rem; }
   .search-btn i { font-size: 16px; margin-right: 6px; }
 
-  .pc-card-row { gap: 6px; }
-  .pc-actions { display: grid; grid-template-columns: 1fr 20px 20px; gap: 4px; align-items: start; }
-  .copy-btn, .toggle-password-btn { width: 20px; height: 20px; }
-  .toggle-password-btn i, .copy-btn i { font-size: 12px; }
-}
+  .pc-card-row { gap: 4px; justify-content: flex-start; }
+  .pc-card .pc-card-row { display: grid; grid-template-columns: 28px 1fr; align-items: center; }
+
+  .pc-actions { display: grid; grid-template-columns: minmax(0,1fr) 18px 18px; column-gap: 2px; align-items: center; }
+  .pc-actions .pc-password { min-width: 0; }
+  .copy-btn, .toggle-password-btn { width: 18px; height: 18px; }
+  .toggle-password-btn i, .copy-btn i { font-size: 14px; }
+  .pc-password { padding: 2px 4px; }
+  .results-cards.mobile-only { display: grid; }
+  .results-table.desktop-only { display: none !important; }
 }
 
 /* Links */
@@ -1589,3 +1584,9 @@ a:visited {
 [data-theme="dark"] .clear-filter:hover {
     background: rgba(239, 68, 68, 0.1);
 }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: 1rem; padding: 8px 12px; background: #333; color: #fff; border-radius: 999px; font-size: 0.85rem; opacity: 0; pointer-events: none; transition: opacity .2s, bottom .2s; z-index: 1000; }
+.toast.show { opacity: 0.95; bottom: 1.25rem; }
+
+.skeleton-overlay { position: absolute; inset: 0; background: transparent; padding: 8px; display: grid; gap: 12px; }
+.skeleton-card { height: 72px; border-radius: var(--radius); overflow: hidden; background: linear-gradient(90deg, #eee 25%, #f5f5f5 37%, #eee 63%); background-size: 400% 100%; animation: shimmer 1.2s infinite; }
+@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }

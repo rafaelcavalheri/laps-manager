@@ -199,6 +199,7 @@ if (file_exists($logFile)) {
   <button class="theme-toggle" onclick="toggleTheme()" title="Alternar tema">
     <i class="fas fa-moon"></i>
   </button>
+  <div id="toast" class="toast" aria-live="polite" aria-atomic="true"></div>
   <div class="container">
     <header class="header">
       <div class="title">
@@ -387,10 +388,28 @@ if (file_exists($logFile)) {
                     </a>
                   </div>
                 </td>
-                <td><?= htmlspecialchars($r['ExpirationTimestamp'] ?? '') ?></td>
+                <td>
+                  <?php 
+                    $exp = $r['ExpirationTimestamp'] ?? '';
+                    $statusClass = 'status-ok';
+                    $title = '';
+                    if ($exp) {
+                      $now = new DateTime('now');
+                      $expDt = new DateTime($exp);
+                      $diff = (int)$now->diff($expDt)->format('%r%a');
+                      if ($diff < 0) { $statusClass = 'status-expired'; }
+                      elseif ($diff <= 7) { $statusClass = 'status-warn'; }
+                      else { $statusClass = 'status-ok'; }
+                      $title = ($diff < 0) ? 'Expirada' : ($diff.' dias');
+                    }
+                  ?>
+                  <span class="status-pill <?= $statusClass ?>" title="<?= htmlspecialchars($title) ?>"><?= htmlspecialchars($exp) ?></span>
+                </td>
                 <td>
                   <?php if ($r['ManualPassword'] !== null): ?>
-                    <?= htmlspecialchars($r['ManualPassword']) ?>
+                    <div class="password-container">
+                      <div class="password-text manual"><?= htmlspecialchars($r['ManualPassword']) ?></div>
+                    </div>
                   <?php else: ?>
                     <span class="text-muted">—</span>
                   <?php endif; ?>
@@ -398,6 +417,9 @@ if (file_exists($logFile)) {
                 <td>
                   <div style="display: flex; gap: 6px; align-items: center; justify-content: flex-end;">
                     <?php if ($r['ManualPassword'] !== null): ?>
+                      <button class="toggle-password-btn" data-target=".password-text.manual" onclick="togglePassword(this)" title="Visualizar Senha Manual">
+                        <i class="far fa-eye"></i>
+                      </button>
                       <button class="copy-btn" onclick="copyToClipboard('<?= htmlspecialchars($r['ManualPassword']) ?>')" title="Copiar Senha Manual">
                         <i class="far fa-copy"></i>
                       </button>
@@ -408,7 +430,10 @@ if (file_exists($logFile)) {
                         <i class="fas fa-trash-alt"></i>
                       </button>
                     <?php else: ?>
-                      <button class="copy-btn" style="opacity: 0.3; cursor: not-allowed;" disabled>
+                      <button class="toggle-password-btn" data-target=".password-text.manual" style="opacity: 0.3; cursor: not-allowed;" disabled title="Visualizar Senha Manual">
+                        <i class="far fa-eye"></i>
+                      </button>
+                      <button class="copy-btn" style="opacity: 0.3; cursor: not-allowed;" disabled title="Copiar Senha Manual">
                         <i class="far fa-copy"></i>
                       </button>
                       <button class="icon-btn" onclick="editPasswordForm('<?= htmlspecialchars($r['ComputerName'] ?? '') ?>')" title="Adicionar Senha Manual">
@@ -450,15 +475,31 @@ if (file_exists($logFile)) {
             </div>
             <div class="pc-card-row">
               <span class="pc-label"><i class="fas fa-calendar-day"></i></span>
-              <span class="pc-value"><?= htmlspecialchars($r['ExpirationTimestamp'] ?? '') ?></span>
+              <?php 
+                $exp = $r['ExpirationTimestamp'] ?? '';
+                $statusClass = 'status-ok';
+                $title = '';
+                if ($exp) {
+                  $now = new DateTime('now');
+                  $expDt = new DateTime($exp);
+                  $diff = (int)$now->diff($expDt)->format('%r%a');
+                  if ($diff < 0) { $statusClass = 'status-expired'; }
+                  elseif ($diff <= 7) { $statusClass = 'status-warn'; }
+                  else { $statusClass = 'status-ok'; }
+                  $title = ($diff < 0) ? 'Expirada' : ($diff.' dias');
+                }
+              ?>
+              <span class="status-pill <?= $statusClass ?>" title="<?= htmlspecialchars($title) ?>"><?= htmlspecialchars($exp) ?></span>
             </div>
             <div class="pc-card-row">
               <span class="pc-label"><i class="fas fa-pen"></i></span>
               <div class="pc-actions">
-                <span class="pc-password <?= ($r['ManualPassword'] ?? '') !== '' ? '' : 'empty' ?>"><?= htmlspecialchars($r['ManualPassword'] ?? '') ?></span>
+                <span class="pc-password manual <?= ($r['ManualPassword'] ?? '') !== '' ? '' : 'empty' ?>"><?= htmlspecialchars($r['ManualPassword'] ?? '') ?></span>
                 <?php if ($r['ManualPassword'] !== null): ?>
+                  <button class="toggle-password-btn" data-target=".pc-password.manual" onclick="togglePassword(this)"><i class="far fa-eye"></i></button>
                   <button class="copy-btn" onclick="copyToClipboard('<?= htmlspecialchars($r['ManualPassword']) ?>')"><i class="far fa-copy"></i></button>
                 <?php else: ?>
+                  <button class="toggle-password-btn" data-target=".pc-password.manual" style="opacity:0.3;cursor:not-allowed;" disabled><i class="far fa-eye"></i></button>
                   <button class="copy-btn" style="opacity:0.3;cursor:not-allowed;" disabled><i class="far fa-copy"></i></button>
                 <?php endif; ?>
               </div>
@@ -494,15 +535,32 @@ if (file_exists($logFile)) {
         document.body.setAttribute('data-theme', savedTheme);
         const icon = document.querySelector('.theme-toggle i');
         icon.className = savedTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+        adjustMobileHeader();
     });
     
     function togglePassword(button) {
-      const container = button.closest('.password-container') || button.closest('.pc-actions');
-      const passwordText = container.querySelector('.password-text') || container.querySelector('.pc-password');
-      const icon = button.querySelector('i');
+      const targetSelector = button.getAttribute('data-target');
+      let passwordText = null;
+      if (targetSelector) {
+        const scope = button.closest('tr') || button.closest('.pc-card') || document;
+        passwordText = scope.querySelector(targetSelector);
+      }
+      if (!passwordText) {
+        const container = button.closest('.password-container') || button.closest('.pc-actions');
+        passwordText = container ? (container.querySelector('.password-text') || container.querySelector('.pc-password')) : null;
+      }
+      if (!passwordText) {
+        const scope = button.closest('tr') || button.closest('.pc-card');
+        if (scope) {
+          passwordText = scope.querySelector('.password-text') || scope.querySelector('.pc-password');
+        }
+      }
       if (!passwordText) return;
+      const icon = button.querySelector('i');
       passwordText.classList.toggle('visible');
-      icon.className = passwordText.classList.contains('visible') ? 'far fa-eye-slash' : 'far fa-eye';
+      if (icon) {
+        icon.className = passwordText.classList.contains('visible') ? 'far fa-eye-slash' : 'far fa-eye';
+      }
     }
 
     function updateData(event) {
@@ -598,10 +656,17 @@ if (file_exists($logFile)) {
       form.submit();
     }
 
+    function showToast(message){
+      const t = document.getElementById('toast');
+      if (!t) return;
+      t.textContent = message;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2000);
+    }
     function copyToClipboard(txt){
       navigator.clipboard.writeText(txt)
-        .then(() => alert('Copiado para a área de transferência!'))
-        .catch(() => alert('Erro ao copiar.'));
+        .then(() => showToast('Copiado'))
+        .catch(() => showToast('Erro ao copiar'))
     }
 
     function toggleAlphabetGuide() {
@@ -640,3 +705,30 @@ if (file_exists($logFile)) {
   </script>
 </body>
 </html>
+<script>
+  function debounce(fn, ms){ let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); }; }
+  document.addEventListener('DOMContentLoaded', () => {
+    const input = document.querySelector('.search-input');
+    const form = document.querySelector('.search-form');
+    const submitDebounced = debounce(() => { if (input && input.value.trim() !== '') { showLoadingSkeleton(); form.submit(); } }, 350);
+    if (input) { input.addEventListener('input', submitDebounced); }
+    if (form) { form.addEventListener('submit', () => { showLoadingSkeleton(); adjustMobileHeader(); }); }
+  });
+  function showLoadingSkeleton(){
+    const main = document.querySelector('.main-content');
+    if (!main) return;
+    const overlay = document.createElement('div');
+    overlay.className = 'skeleton-overlay';
+    for (let i=0;i<6;i++){ const s = document.createElement('div'); s.className = 'skeleton-card'; overlay.appendChild(s); }
+    main.innerHTML = '';
+    main.appendChild(overlay);
+  }
+  function adjustMobileHeader(){
+    if (!window.matchMedia('(max-width: 768px)').matches) return;
+    const header = document.querySelector('.header');
+    if (!header) return;
+    const h = header.offsetHeight;
+    document.documentElement.style.setProperty('--mobile-header-h', h + 'px');
+  }
+  window.addEventListener('resize', adjustMobileHeader);
+</script>
